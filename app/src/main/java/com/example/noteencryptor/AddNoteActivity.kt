@@ -16,15 +16,17 @@ class AddNoteActivity : AppCompatActivity() {
 
         val titleEditText: TextInputEditText = findViewById(R.id.titleEditText)
         val descriptionEditText: TextInputEditText = findViewById(R.id.descriptionEditText)
-        val passwordEditText: TextInputEditText = findViewById(R.id.passwordEditText) // Nowe pole na hasło
+        val passwordEditText: TextInputEditText = findViewById(R.id.passwordEditText)
         val saveButton: Button = findViewById(R.id.saveButton)
 
         val noteId = intent.getLongExtra("noteId", -1)
         val title = intent.getStringExtra("title") ?: ""
         val description = intent.getStringExtra("description") ?: ""
+        val password = intent.getStringExtra("password") ?: ""
 
         titleEditText.setText(title)
         descriptionEditText.setText(description)
+        passwordEditText.setText(password)
 
         saveButton.setOnClickListener {
             val title = titleEditText.text.toString()

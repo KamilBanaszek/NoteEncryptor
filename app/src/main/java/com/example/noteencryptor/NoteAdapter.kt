@@ -30,7 +30,7 @@ class NoteAdapter(
         val note = notes[position]
         holder.titleTextView.text = note.title
         holder.descriptionTextView.text = note.description
-        holder.timestampTextView.text = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(note.timestamp))
+        holder.timestampTextView.text = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault()).format(java.util.Date(note.timestamp))
 
         holder.deleteButton.setOnClickListener {
             onDeleteClick(note)
@@ -53,15 +53,15 @@ class NoteAdapter(
         }
     }
 
-    fun updateNote(updatedNote: Note) {
-        val index = notes.indexOfFirst { it.id == updatedNote.id }
+    fun updateNote(note: Note) {
+        val index = notes.indexOfFirst { it.id == note.id }
         if (index != -1) {
-            notes[index] = updatedNote
+            notes[index] = note
             notifyItemChanged(index)
         }
     }
 
-    fun getNoteById(noteId: Long): Note? {
-        return notes.find { it.id == noteId }
+    fun getNoteById(id: Long): Note? {
+        return notes.find { it.id == id }
     }
 }

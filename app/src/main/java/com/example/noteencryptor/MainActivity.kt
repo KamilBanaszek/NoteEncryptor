@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
                 .setPositiveButton("OK") { dialog, _ ->
                     val enteredPassword = passwordEditText.text.toString()
                     if (hashPassword(enteredPassword) == note.passwordHash) {
-                        editNote(note)
+                        editNote(note, enteredPassword)
                     } else {
                         Toast.makeText(this, "Błędne hasło", Toast.LENGTH_SHORT).show()
                     }
@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 .show()
         } else {
-            editNote(note)
+            editNote(note, null)
         }
     }
 
@@ -116,67 +116,63 @@ class MainActivity : AppCompatActivity() {
         return hash.joinToString("") { "%02x".format(it) }
     }
 
-    private fun editNote(note: Note) {
+    private fun editNote(note: Note, password: String?) {
         val intent = Intent(this, AddNoteActivity::class.java)
         intent.putExtra("noteId", note.id)
         intent.putExtra("title", note.title)
         intent.putExtra("description", note.description)
         intent.putExtra("passwordHash", note.passwordHash)
+        intent.putExtra("password", password)
         startActivityForResult(intent, 2)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 1 && resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             data?.let {
                 val title = it.getStringExtra("title") ?: ""
                 val description = it.getStringExtra("description") ?: ""
                 val timestamp = it.getLongExtra("timestamp", System.currentTimeMillis())
                 val passwordHash = it.getStringExtra("passwordHash")
                 val note = Note(
-                    id = notes.size.toLong() + 1,
+                    id = System.currentTimeMillis(),
                     title = title,
                     description = description,
                     timestamp = timestamp,
                     passwordHash = passwordHash
                 )
-                notes.add(note)
-                PreferenceHelper.saveNotes(this, notes)
-                filterNotes(searchEditText.text.toString())
-            }
-        } else if (requestCode == 2 && resultCode == RESULT_OK) {
-            data?.let {
-                val noteId = it.getLongExtra("noteId", -1)
-                val title = it.getStringExtra("title") ?: ""
-                val description = it.getStringExtra("description") ?: ""
-                val timestamp = it.getLongExtra("timestamp", System.currentTimeMillis())
-                val passwordHash = it.getStringExtra("passwordHash")
-                val note = adapter.getNoteById(noteId)
-                note?.let {
-                    it.title = title
-                    it.description = description
-                    it.timestamp = timestamp
-                    it.passwordHash = passwordHash
-                    adapter.updateNote(it)
-                    PreferenceHelper.saveNotes(this, notes)
-                    filterNotes(searchEditText.text.toString())
+
+                when (requestCode) {
+                    1 -> {
+                        addNoteToTop(note)
+                    }
+                    2 -> {
+                        val noteId = it.getLongExtra("noteId", -1)
+                        val existingNote = notes.find { it.id == noteId }
+                        existingNote?.let { updatedNote ->
+                            updatedNote.title = title
+                            updatedNote.description = description
+                            updatedNote.timestamp = timestamp
+                            updatedNote.passwordHash = passwordHash
+                            PreferenceHelper.saveNotes(this, notes)
+                            filterNotes(searchEditText.text.toString())
+                        }
+                    }
+                    3 -> {
+                        addNoteToTop(note)
+                    }
+                    else -> {}
                 }
             }
-        } else if (requestCode == 3 && resultCode == RESULT_OK) {
-            data?.let {
-                val title = it.getStringExtra("title") ?: ""
-                val description = it.getStringExtra("description") ?: ""
-                val timestamp = it.getLongExtra("timestamp", System.currentTimeMillis())
-                val note = Note(
-                    id = notes.size.toLong() + 1,
-                    title = title,
-                    description = description,
-                    timestamp = timestamp
-                )
-                notes.add(note)
-                PreferenceHelper.saveNotes(this, notes)
-                filterNotes(searchEditText.text.toString())
-            }
         }
+    }
+
+    private fun addNoteToTop(note: Note) {
+        notes.add(0, note)
+        filteredNotes.add(0, note)
+        adapter.notifyItemInserted(0)
+        recyclerView.scrollToPosition(0)
+        PreferenceHelper.saveNotes(this, notes)
+        filterNotes(searchEditText.text.toString())
     }
 }
