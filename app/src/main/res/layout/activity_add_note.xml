@@ -29,12 +29,25 @@
         android:background="@drawable/edit_text_bg"
         android:padding="10dp" />
 
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/passwordEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Hasło"
+        android:inputType="textPassword"
+        android:layout_below="@id/descriptionEditText"
+        android:layout_margin="16dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#888888"
+        android:background="@drawable/edit_text_bg"
+        android:padding="10dp" />
+
     <Button
         android:id="@+id/saveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/save"
-        android:layout_below="@id/descriptionEditText"
+        android:layout_below="@id/passwordEditText"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:backgroundTint="@color/purple_500"

@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
+import com.google.android.material.textfield.TextInputEditText
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         filteredNotes.addAll(notes)
         adapter = NoteAdapter(filteredNotes,
             onDeleteClick = { note -> deleteNote(note) },
-            onEditClick = { note -> editNote(note) }
+            onEditClick = { note -> editNoteWithPasswordCheck(note) }
         )
         recyclerView.adapter = adapter
 
@@ -82,11 +84,44 @@ class MainActivity : AppCompatActivity() {
         filterNotes(searchEditText.text.toString())
     }
 
+    private fun editNoteWithPasswordCheck(note: Note) {
+        if (note.passwordHash != null) {
+            val passwordEditText = TextInputEditText(this)
+            passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+
+            AlertDialog.Builder(this)
+                .setTitle("Enter Password")
+                .setView(passwordEditText)
+                .setPositiveButton("OK") { dialog, _ ->
+                    val enteredPassword = passwordEditText.text.toString()
+                    if (hashPassword(enteredPassword) == note.passwordHash) {
+                        editNote(note)
+                    } else {
+                        Toast.makeText(this, "Incorrect Password", Toast.LENGTH_SHORT).show()
+                    }
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        } else {
+            editNote(note)
+        }
+    }
+
+    private fun hashPassword(password: String): String {
+        val digest = java.security.MessageDigest.getInstance("SHA-256")
+        val hash = digest.digest(password.toByteArray(Charsets.UTF_8))
+        return hash.joinToString("") { "%02x".format(it) }
+    }
+
     private fun editNote(note: Note) {
         val intent = Intent(this, AddNoteActivity::class.java)
         intent.putExtra("noteId", note.id)
         intent.putExtra("title", note.title)
         intent.putExtra("description", note.description)
+        intent.putExtra("passwordHash", note.passwordHash)
         startActivityForResult(intent, 2)
     }
 
@@ -97,11 +132,13 @@ class MainActivity : AppCompatActivity() {
                 val title = it.getStringExtra("title") ?: ""
                 val description = it.getStringExtra("description") ?: ""
                 val timestamp = it.getLongExtra("timestamp", System.currentTimeMillis())
+                val passwordHash = it.getStringExtra("passwordHash")
                 val note = Note(
                     id = notes.size.toLong() + 1,
                     title = title,
                     description = description,
-                    timestamp = timestamp
+                    timestamp = timestamp,
+                    passwordHash = passwordHash
                 )
                 notes.add(note)
                 PreferenceHelper.saveNotes(this, notes)
@@ -113,11 +150,13 @@ class MainActivity : AppCompatActivity() {
                 val title = it.getStringExtra("title") ?: ""
                 val description = it.getStringExtra("description") ?: ""
                 val timestamp = it.getLongExtra("timestamp", System.currentTimeMillis())
+                val passwordHash = it.getStringExtra("passwordHash")
                 val note = adapter.getNoteById(noteId)
                 note?.let {
                     it.title = title
                     it.description = description
                     it.timestamp = timestamp
+                    it.passwordHash = passwordHash
                     adapter.updateNote(it)
                     PreferenceHelper.saveNotes(this, notes)
                     filterNotes(searchEditText.text.toString())
