@@ -2,7 +2,7 @@
 ## Wprowadzenie
 NoteEncryptor to aplikacja do robienia notatek, zaprojektowana, aby uporządkować i chronić notatki. Dzięki NoteEncryptor możesz tworzyć zarówno notatki tekstowe, jak i głosowe, każda z opcją dodania hasła w celu zwiększenia bezpieczeństwa.
 
-![Ekran główny aplikacji](app/src/main/res/drawable/screen.jpg)
+![Ekran główny aplikacji](app/src/main/res/drawable/441995814_1900358643735473_8773781083139932940_n.jpg)
 
 ## Layout Aplikacji
 ### activity_add_note.xml
