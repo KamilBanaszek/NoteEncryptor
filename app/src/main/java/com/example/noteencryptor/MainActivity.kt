@@ -14,8 +14,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: NoteAdapter
-    private lateinit var notes: MutableList<Note>
-    private lateinit var filteredNotes: MutableList<Note>
+    private var notes: MutableList<Note> = mutableListOf()
+    private var filteredNotes: MutableList<Note> = mutableListOf()
     private lateinit var searchEditText: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,10 +25,11 @@ class MainActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
         notes = PreferenceHelper.getNotes(this).toMutableList()
-        filteredNotes = notes.toMutableList()
-        adapter = NoteAdapter(filteredNotes) { note ->
-            deleteNote(note)
-        }
+        filteredNotes.addAll(notes)
+        adapter = NoteAdapter(filteredNotes,
+            onDeleteClick = { note -> deleteNote(note) },
+            onEditClick = { note -> editNote(note) }
+        )
         recyclerView.adapter = adapter
 
         searchEditText = findViewById(R.id.searchEditText)
@@ -62,6 +63,14 @@ class MainActivity : AppCompatActivity() {
         filterNotes(searchEditText.text.toString())
     }
 
+    private fun editNote(note: Note) {
+        val intent = Intent(this, AddNoteActivity::class.java)
+        intent.putExtra("noteId", note.id)
+        intent.putExtra("title", note.title) // Przekazanie tytułu notatki
+        intent.putExtra("description", note.description) // Przekazanie opisu notatki
+        startActivityForResult(intent, 2)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1 && resultCode == RESULT_OK) {
@@ -78,6 +87,22 @@ class MainActivity : AppCompatActivity() {
                 notes.add(note)
                 PreferenceHelper.saveNotes(this, notes)
                 filterNotes(searchEditText.text.toString())
+            }
+        } else if (requestCode == 2 && resultCode == RESULT_OK) {
+            data?.let {
+                val noteId = it.getLongExtra("noteId", -1)
+                val title = it.getStringExtra("title") ?: ""
+                val description = it.getStringExtra("description") ?: ""
+                val timestamp = it.getLongExtra("timestamp", System.currentTimeMillis())
+                val note = adapter.getNoteById(noteId)
+                note?.let {
+                    it.title = title
+                    it.description = description
+                    it.timestamp = timestamp
+                    adapter.updateNote(it)
+                    PreferenceHelper.saveNotes(this, notes)
+                    filterNotes(searchEditText.text.toString())
+                }
             }
         }
     }

@@ -2,7 +2,7 @@ package com.example.noteencryptor
 
 data class Note(
     val id: Long = 0,
-    val title: String,
-    val description: String,
-    val timestamp: Long
+    var title: String,
+    var description: String,
+    var timestamp: Long
 )

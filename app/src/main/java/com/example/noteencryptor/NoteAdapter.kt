@@ -5,15 +5,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
+import android.widget.Button
 
-class NoteAdapter(private val notes: MutableList<Note>, private val onDeleteClick: (Note) -> Unit) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
+
+class NoteAdapter(
+    private val notes: MutableList<Note>,
+    private val onDeleteClick: (Note) -> Unit,
+    private val onEditClick: (Note) -> Unit
+) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
 
     class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleTextView: TextView = itemView.findViewById(R.id.noteTitle)
         val descriptionTextView: TextView = itemView.findViewById(R.id.noteDescription)
         val timestampTextView: TextView = itemView.findViewById(R.id.noteTimestamp)
-        val deleteButton: MaterialButton = itemView.findViewById(R.id.deleteButton)
+        val deleteButton: Button = itemView.findViewById(R.id.deleteButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
@@ -30,6 +35,10 @@ class NoteAdapter(private val notes: MutableList<Note>, private val onDeleteClic
         holder.deleteButton.setOnClickListener {
             onDeleteClick(note)
         }
+
+        holder.itemView.setOnClickListener {
+            onEditClick(note)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -42,5 +51,17 @@ class NoteAdapter(private val notes: MutableList<Note>, private val onDeleteClic
             notes.removeAt(position)
             notifyItemRemoved(position)
         }
+    }
+
+    fun updateNote(updatedNote: Note) {
+        val index = notes.indexOfFirst { it.id == updatedNote.id }
+        if (index != -1) {
+            notes[index] = updatedNote
+            notifyItemChanged(index)
+        }
+    }
+
+    fun getNoteById(noteId: Long): Note? {
+        return notes.find { it.id == noteId }
     }
 }

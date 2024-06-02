@@ -18,12 +18,20 @@ class AddNoteActivity : AppCompatActivity() {
         val descriptionEditText: TextInputEditText = findViewById(R.id.descriptionEditText)
         val saveButton: MaterialButton = findViewById(R.id.saveButton)
 
+        val noteId = intent.getLongExtra("noteId", -1)
+        val title = intent.getStringExtra("title") ?: ""
+        val description = intent.getStringExtra("description") ?: ""
+
+        titleEditText.setText(title)
+        descriptionEditText.setText(description)
+
         saveButton.setOnClickListener {
             val title = titleEditText.text.toString()
             val description = descriptionEditText.text.toString()
             val timestamp = Date().time
 
             val resultIntent = Intent().apply {
+                putExtra("noteId", noteId)
                 putExtra("title", title)
                 putExtra("description", description)
                 putExtra("timestamp", timestamp)
