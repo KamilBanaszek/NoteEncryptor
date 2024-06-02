@@ -1,3 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">NoteEncryptor</string>
+    <string name="app_name">Notatnik</string>
+    <string name="note_title">Tytuł notatki</string>
+    <string name="note_description">Opis notatki</string>
+    <string name="save">Zapisz</string>
 </resources>
