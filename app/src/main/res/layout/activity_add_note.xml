@@ -33,7 +33,7 @@
         android:id="@+id/passwordEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Hasło"
+        android:hint="@string/password"
         android:inputType="textPassword"
         android:layout_below="@id/descriptionEditText"
         android:layout_margin="16dp"

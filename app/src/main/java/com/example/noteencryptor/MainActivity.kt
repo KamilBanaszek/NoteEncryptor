@@ -8,9 +8,9 @@ import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 
 class MainActivity : AppCompatActivity() {
@@ -46,16 +46,16 @@ class MainActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        val fab: Button = findViewById(R.id.fab)
+        val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener {
             showNoteTypeDialog()
         }
     }
 
     private fun showNoteTypeDialog() {
-        val options = arrayOf("Text Note", "Voice Note")
+        val options = arrayOf("Notatka tekstowa", "Notatka głosowa")
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Select Note Type")
+        builder.setTitle("Wybierz typ notatki")
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> {
@@ -90,18 +90,18 @@ class MainActivity : AppCompatActivity() {
             passwordEditText.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
 
             AlertDialog.Builder(this)
-                .setTitle("Enter Password")
+                .setTitle("Wprowadź hasło")
                 .setView(passwordEditText)
                 .setPositiveButton("OK") { dialog, _ ->
                     val enteredPassword = passwordEditText.text.toString()
                     if (hashPassword(enteredPassword) == note.passwordHash) {
                         editNote(note)
                     } else {
-                        Toast.makeText(this, "Incorrect Password", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Błędne hasło", Toast.LENGTH_SHORT).show()
                     }
                     dialog.dismiss()
                 }
-                .setNegativeButton("Cancel") { dialog, _ ->
+                .setNegativeButton("Anuluj") { dialog, _ ->
                     dialog.dismiss()
                 }
                 .show()

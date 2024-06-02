@@ -4,4 +4,9 @@
     <string name="note_title">Tytuł notatki</string>
     <string name="note_description">Opis notatki</string>
     <string name="save">Zapisz</string>
+    <string name="password">Hasło</string>
+    <string name="search_note">Wyszukaj notatki</string>
+    <string name="app_title">Notatnik</string>
+    <string name="voice_note">Nagraj notatkę</string>
+    <string name="delete_button">Usuń</string>
 </resources>
