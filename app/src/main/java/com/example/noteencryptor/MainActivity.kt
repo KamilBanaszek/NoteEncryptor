@@ -1,5 +1,6 @@
 package com.example.noteencryptor
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -45,9 +46,27 @@ class MainActivity : AppCompatActivity() {
 
         val fab: Button = findViewById(R.id.fab)
         fab.setOnClickListener {
-            val intent = Intent(this, AddNoteActivity::class.java)
-            startActivityForResult(intent, 1)
+            showNoteTypeDialog()
         }
+    }
+
+    private fun showNoteTypeDialog() {
+        val options = arrayOf("Text Note", "Voice Note")
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Select Note Type")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> {
+                        val intent = Intent(this, AddNoteActivity::class.java)
+                        startActivityForResult(intent, 1)
+                    }
+                    1 -> {
+                        val intent = Intent(this, VoiceNoteActivity::class.java)
+                        startActivityForResult(intent, 3)
+                    }
+                }
+            }
+        builder.create().show()
     }
 
     private fun filterNotes(query: String?) {
@@ -66,8 +85,8 @@ class MainActivity : AppCompatActivity() {
     private fun editNote(note: Note) {
         val intent = Intent(this, AddNoteActivity::class.java)
         intent.putExtra("noteId", note.id)
-        intent.putExtra("title", note.title) // Przekazanie tytułu notatki
-        intent.putExtra("description", note.description) // Przekazanie opisu notatki
+        intent.putExtra("title", note.title)
+        intent.putExtra("description", note.description)
         startActivityForResult(intent, 2)
     }
 
@@ -103,6 +122,21 @@ class MainActivity : AppCompatActivity() {
                     PreferenceHelper.saveNotes(this, notes)
                     filterNotes(searchEditText.text.toString())
                 }
+            }
+        } else if (requestCode == 3 && resultCode == RESULT_OK) {
+            data?.let {
+                val title = it.getStringExtra("title") ?: ""
+                val description = it.getStringExtra("description") ?: ""
+                val timestamp = it.getLongExtra("timestamp", System.currentTimeMillis())
+                val note = Note(
+                    id = notes.size.toLong() + 1,
+                    title = title,
+                    description = description,
+                    timestamp = timestamp
+                )
+                notes.add(note)
+                PreferenceHelper.saveNotes(this, notes)
+                filterNotes(searchEditText.text.toString())
             }
         }
     }
